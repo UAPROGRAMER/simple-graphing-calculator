@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=SGC
+Exec=sgc
+Icon=sgc
+Terminal=false
+Categories=Utility;
