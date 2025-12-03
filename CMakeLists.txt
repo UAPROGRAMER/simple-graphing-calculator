@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.16)
 
 project(simple-graphing-calculator LANGUAGES CXX C)
 
@@ -46,11 +46,6 @@ if (WIN32)
     add_executable(sgc WIN32 ${sources} sgc.rc)
 elseif (UNIX AND NOT APPLE)
     add_executable(sgc ${sources})
-
-    install(FILES data/icons/sgc128.png
-        DESTINATION share/icons/hicolor/128x128/apps)
-    
-    install(FILES sgc.desktop DESTINATION share/applications)
 endif ()
 
 target_include_directories(sgc PUBLIC
@@ -61,14 +56,36 @@ target_include_directories(sgc PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/mini
 )
 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(extern/glfw)
+
+find_package(OpenGL REQUIRED)
+
 if (WIN32)
-    target_link_libraries(sgc glfw3 opengl32)
+    target_link_libraries(sgc glfw OpenGL::GL)
+    target_link_options(sgc PRIVATE "-static")
 elseif (UNIX AND NOT APPLE)
-    target_link_libraries(sgc glfw GL)
-endif ()
+    target_link_libraries(sgc glfw OpenGL::GL dl pthread)
+    target_link_options(sgc PRIVATE "-static-libgcc" "-static-libstdc++")
+endif()
 
 add_custom_command(TARGET sgc POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/data
         $<TARGET_FILE_DIR:sgc>/data
+)
+
+add_custom_target(zip_sgc ALL
+    COMMAND ${CMAKE_COMMAND} -E tar cfv
+        ${CMAKE_CURRENT_SOURCE_DIR}/dest/SGC.zip
+        --format=zip
+        SGC
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/dest
+    DEPENDS sgc
 )

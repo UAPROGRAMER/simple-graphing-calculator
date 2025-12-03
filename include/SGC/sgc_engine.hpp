@@ -50,8 +50,6 @@ class SGCEngine {
 
   void windowSizeCallback(int width, int height);
 
-  void debugCallback(const GLchar* msg);
-
   void scrollCallback(double offsetX, double offsetY);
 
   void keyCallback(int key, int scancode, int action, int mods);

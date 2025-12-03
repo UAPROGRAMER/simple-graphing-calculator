@@ -68,11 +68,6 @@ void glfwWindowSizeCallback(GLFWwindow*, int width, int height) {
   if (activeEngine) activeEngine->windowSizeCallback(width, height);
 }
 
-void __stdcall glDebugCallback(GLenum, GLenum, GLuint, GLenum, GLsizei,
-                               const GLchar* msg, const void*) {
-  if (activeEngine) activeEngine->debugCallback(msg);
-}
-
 void glfwScrollCallback(GLFWwindow*, double xoffset, double yoffset) {
   activeEngine->scrollCallback(xoffset, yoffset);
 }
@@ -140,11 +135,6 @@ SGCEngine::SGCEngine() {
 
   // OpenGL Setup
   glViewport(0, 0, 800, 800);
-
-  glEnable(GL_DEBUG_OUTPUT);
-  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
-  // glDebugMessageCallback(glDebugCallback, nullptr);
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -215,12 +205,9 @@ SGCEngine::~SGCEngine() {
 
   ImGui::DestroyContext();
 
-  glDisable(GL_DEBUG_OUTPUT);
-  glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
-  glDebugMessageCallback(nullptr, nullptr);
-
   glfwSetFramebufferSizeCallback(window, nullptr);
+  glfwSetScrollCallback(window, nullptr);
+  glfwSetKeyCallback(window, nullptr);
 
   glfwTerminate();
 
@@ -393,7 +380,7 @@ void SGCEngine::processGUI() {
   if (isInfoWindowOpen) {
     ImGui::Begin("Info", &isInfoWindowOpen, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::Text("SGC version: 1.0.0");
+    ImGui::Text("SGC version: 1.1.0");
 
     ImGui::Text(("WinSize: (" + std::to_string(windowWidth) + ";" +
                  std::to_string(windowHeight) + ")")
@@ -775,10 +762,6 @@ void SGCEngine::windowSizeCallback(int width, int height) {
   glViewport(0, 0, width, height);
   windowWidth = width;
   windowHeight = height;
-}
-
-void SGCEngine::debugCallback(const GLchar* msg) {
-  std::cout << "[OpenGL]: " << msg << "\n";
 }
 
 void SGCEngine::scrollCallback(double offsetX, double offsetY) {
