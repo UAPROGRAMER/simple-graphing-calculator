@@ -709,8 +709,18 @@ void SGCEngine::processGUI() {
         std::filesystem::remove(
             "./data/saves/" +
             graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
-        graphsSavefilesCStr.erase(graphsSavefilesCStr.begin() + graphsSavefilesSelectedItemIndex);
-        graphsSavefiles.erase(graphsSavefiles.begin() + graphsSavefilesSelectedItemIndex);
+        graphsSavefilesSelectedItemIndex = -1;
+
+        graphsSavefiles.clear();
+        graphsSavefilesCStr.clear();
+
+        for (const auto& file :
+            std::filesystem::directory_iterator("./data/saves"))
+          if (std::filesystem::is_regular_file(file))
+            graphsSavefiles.push_back(file.path().stem().string());
+
+        for (const auto& file : graphsSavefiles)
+          graphsSavefilesCStr.push_back(file.c_str());
       }
     }
 
