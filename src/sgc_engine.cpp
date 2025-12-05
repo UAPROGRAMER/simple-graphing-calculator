@@ -518,7 +518,7 @@ void SGCEngine::processGUI() {
                             ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphName); i++) graphName[i] = '\0';
     for (std::size_t i = 0; i < sizeof(graphBody); i++) graphBody[i] = '\0';
-    for (std::size_t i = 0; i < sizeof(graphColor); i++) graphColor[i] = 0.5;
+    for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0.5;
     graphThickness = 1.0;
     graphIsFunctional = true;
   }
@@ -557,7 +557,7 @@ void SGCEngine::processGUI() {
                             ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphName); i++) graphName[i] = '\0';
     for (std::size_t i = 0; i < sizeof(graphBody); i++) graphBody[i] = '\0';
-    for (std::size_t i = 0; i < sizeof(graphColor); i++) graphColor[i] = 0.5;
+    for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0.5;
     for (std::size_t i = 0;
          i < std::min<std::size_t>(sizeof(graphName),
                                    graphs.at(editGraphIndex).name.size());
