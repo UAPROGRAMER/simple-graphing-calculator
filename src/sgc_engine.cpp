@@ -710,6 +710,7 @@ void SGCEngine::processGUI() {
             "./data/saves/" +
             graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
         graphsSavefilesSelectedItemIndex = -1;
+        graphsSavefileSelected = false;
 
         graphsSavefiles.clear();
         graphsSavefilesCStr.clear();
