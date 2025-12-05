@@ -382,11 +382,11 @@ void SGCEngine::processGUI() {
 
     ImGui::Text("SGC version: 1.1.0");
 
-    ImGui::Text(("WinSize: (" + std::to_string(windowWidth) + ";" +
+    ImGui::TextUnformatted(("WinSize: (" + std::to_string(windowWidth) + ";" +
                  std::to_string(windowHeight) + ")")
                     .c_str());
-    ImGui::Text(("Zoom: " + std::to_string(zoom)).c_str());
-    ImGui::Text(("Pos: (" + std::to_string(positionX) + ";" +
+    ImGui::TextUnformatted(("Zoom: " + std::to_string(zoom)).c_str());
+    ImGui::TextUnformatted(("Pos: (" + std::to_string(positionX) + ";" +
                  std::to_string(positionY) + ")")
                     .c_str());
 
@@ -396,11 +396,11 @@ void SGCEngine::processGUI() {
     float worldX = (cursorX - windowWidth / 2.0) / zoom + positionX;
     float worldY = -(cursorY - windowHeight / 2.0) / zoom + positionY;
 
-    ImGui::Text(("MousePos: (" + std::to_string(worldX) + ";" +
+    ImGui::TextUnformatted(("MousePos: (" + std::to_string(worldX) + ";" +
                  std::to_string(worldY) + ")")
                     .c_str());
 
-    ImGui::Text(("FPS: " + std::to_string(ImGui::GetIO().Framerate)).c_str());
+    ImGui::TextUnformatted(("FPS: " + std::to_string(ImGui::GetIO().Framerate)).c_str());
 
     ImGui::End();
   }
@@ -446,9 +446,9 @@ void SGCEngine::processGUI() {
           ImGui::Text("Invisible");
 
         if (graphs.at(i).isFunctional)
-          ImGui::Text(("y = " + graphs.at(i).body).c_str());
+          ImGui::TextUnformatted(("y = " + graphs.at(i).body).c_str());
         else
-          ImGui::Text((graphs.at(i).body).c_str());
+          ImGui::TextUnformatted((graphs.at(i).body).c_str());
 
 
         if (ImGui::Button("Edit")) {

@@ -75,6 +75,26 @@ elseif (UNIX AND NOT APPLE)
     target_link_options(sgc PRIVATE "-static-libgcc" "-static-libstdc++")
 endif()
 
+add_compile_options(
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Wconversion
+    -Wsign-conversion
+    -Wfloat-equal
+    -Wformat=2
+    -Wformat-security
+    -Wnull-dereference
+    -Wshadow
+    -Wpointer-arith
+    -Wcast-align
+    -Wmissing-declarations
+    -Woverloaded-virtual
+    -Wnon-virtual-dtor
+    -Wunused
+    -Wuninitialized
+)
+
 add_custom_command(TARGET sgc POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/data
