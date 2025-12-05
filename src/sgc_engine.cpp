@@ -90,6 +90,10 @@ SGCEngine::SGCEngine() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+#if defined(__linux__)
+  glfwWindowHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#endif
+
   window = glfwCreateWindow(800, 800, "Simple Graphing Calculator", nullptr,
                             nullptr);
 
@@ -216,7 +220,7 @@ SGCEngine::~SGCEngine() {
 
 bool SGCEngine::makeShaderProgram() {
   GLint shaderSetupSuccess;
-  GLchar shaderSetupInfoLog[512];
+  static GLchar shaderSetupInfoLog[GL_INFO_LOG_LENGTH];
 
   GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -226,7 +230,7 @@ bool SGCEngine::makeShaderProgram() {
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &shaderSetupSuccess);
 
   if (!shaderSetupSuccess) {
-    glGetShaderInfoLog(vertexShader, 512, nullptr, shaderSetupInfoLog);
+    glGetShaderInfoLog(vertexShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     return false;
   }
 
@@ -248,7 +252,7 @@ bool SGCEngine::makeShaderProgram() {
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &shaderSetupSuccess);
 
   if (!shaderSetupSuccess) {
-    glGetShaderInfoLog(fragmentShader, 512, nullptr, shaderSetupInfoLog);
+    glGetShaderInfoLog(fragmentShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     glDeleteShader(vertexShader);
     return false;
   }
@@ -263,7 +267,7 @@ bool SGCEngine::makeShaderProgram() {
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &shaderSetupSuccess);
 
   if (!shaderSetupSuccess) {
-    glGetProgramInfoLog(shaderProgram, 512, nullptr, shaderSetupInfoLog);
+    glGetProgramInfoLog(shaderProgram, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     return false;
