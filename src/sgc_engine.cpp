@@ -12,7 +12,7 @@
 #include <iostream>
 
 const GLchar* vertexShaderSource =                   //
-    "#version 430 core\n"                            //
+    "#version 330 core\n"                            //
     "layout (location = 0) in vec2 attribPos;"       //
     "out vec2 fragPos;"                              //
     "void main() {"                                  //
@@ -21,7 +21,7 @@ const GLchar* vertexShaderSource =                   //
     "}";
 
 const std::string fragmentShaderSourceStart =                               //
-    "#version 430 core\n"                                                   //
+    "#version 330 core\n"                                                   //
     "#define pi 3.1415927410125732\n"                                       //
     "in vec2 fragPos;"                                                      //
     "out vec4 FragColor;"                                                   //
@@ -81,7 +81,7 @@ SGCEngine::SGCEngine() {
 
   // GLFW Initialization
   glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
@@ -198,7 +198,7 @@ SGCEngine::SGCEngine() {
   // ImGui::StyleColorsLight();
 
   ImGui_ImplGlfw_InitForOpenGL(window, true);
-  ImGui_ImplOpenGL3_Init("#version 430 core");
+  ImGui_ImplOpenGL3_Init("#version 330 core");
 }
 
 SGCEngine::~SGCEngine() {
