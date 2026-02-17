@@ -49,8 +49,8 @@ elseif (UNIX AND NOT APPLE)
 endif ()
 
 target_include_directories(sgc PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glad
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/stb_image
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/mini

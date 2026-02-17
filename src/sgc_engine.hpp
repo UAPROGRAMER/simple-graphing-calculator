@@ -1,12 +1,14 @@
 #pragma once
 
-#include <SGC/opengl.hpp>
 #include <imgui.h>
+
 #include <vector>
-#include <SGC/graph.hpp>
+
+#include "graph.hpp"
+#include "opengl.hpp"
 
 class SGCEngine {
- private:
+private:
   GLFWwindow* window = nullptr;
   GLuint displayVAO = 0;
   GLuint shaderProgram = 0;
@@ -36,7 +38,7 @@ class SGCEngine {
 
   void draw();
 
- public:
+public:
   SGCEngine(const SGCEngine&) = delete;
   SGCEngine& operator=(const SGCEngine&) = delete;
   SGCEngine(SGCEngine&&) = delete;

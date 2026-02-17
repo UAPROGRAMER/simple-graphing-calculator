@@ -3,7 +3,7 @@
 #include <string>
 
 class Graph {
- public:
+public:
   bool isFunctional;
   std::string name;
   std::string body;
@@ -14,8 +14,8 @@ class Graph {
   float thickness;
   bool isVisible = true;
 
-  Graph(bool isFunctional, std::string name, std::string body, float r, float g, float b,
-        float thickness);
-  
+  Graph(bool isFunctional, std::string name, std::string body, float r, float g,
+      float b, float thickness);
+
   std::string getGraphShaderPart() const;
 };

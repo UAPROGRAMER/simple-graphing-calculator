@@ -1,0 +1,9 @@
+{
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/extern/glad",
+    "${workspaceFolder}/extern/glfw/include",
+    "${workspaceFolder}/extern/imgui",
+    "${workspaceFolder}/extern/mini",
+    "${workspaceFolder}/extern/stb_image"
+  ]
+}

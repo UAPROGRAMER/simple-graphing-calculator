@@ -12,7 +12,7 @@ enum class SGCErrorType : int {
 };
 
 class SGCError : std::exception {
- public:
+public:
   int errorCode;
   std::string msg;
 

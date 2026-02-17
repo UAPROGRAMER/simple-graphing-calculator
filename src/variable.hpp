@@ -3,7 +3,7 @@
 #include <string>
 
 class Variable {
- public:
+public:
   std::string name;
   float maxValue;
   float minValue;
@@ -12,7 +12,7 @@ class Variable {
 
   Variable(std::string name, float maxValue, float minValue, float step,
       float value);
-    
+
   std::string getVariableShaderPart() const;
 };
 

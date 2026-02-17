@@ -1,15 +1,17 @@
+#include "sgc_engine.hpp"
+
 #include <stb_image.h>
 
-#include <SGC/error.hpp>
-#include <SGC/imgui.hpp>
-#include <SGC/mINI.hpp>
-#include <SGC/opengl.hpp>
-#include <SGC/sgc_engine.hpp>
-#include <SGC/utils.hpp>
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <iostream>
+
+#include "error.hpp"
+#include "imgui.hpp"
+#include "mINI.hpp"
+#include "opengl.hpp"
+#include "utils.hpp"
 
 const GLchar* vertexShaderSource =                   //
     "#version 330 core\n"                            //
@@ -94,28 +96,24 @@ SGCEngine::SGCEngine() {
   glfwWindowHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
 #endif
 
-  window = glfwCreateWindow(800, 800, "Simple Graphing Calculator", nullptr,
-                            nullptr);
+  window = glfwCreateWindow(
+      800, 800, "Simple Graphing Calculator", nullptr, nullptr);
 
   if (!window)
-    throw SGCError(SGCErrorType::GLFW_ERROR,
-                   "[GLFW]: Failed to create window.\n");
+    throw SGCError(
+        SGCErrorType::GLFW_ERROR, "[GLFW]: Failed to create window.\n");
 
   // GLFW Setup
   GLFWimage windowIcon[4];
   int nrChannels;
-  windowIcon[0].pixels =
-      stbi_load("./data/icons/sgc256.png", &windowIcon[0].width,
-                &windowIcon[0].height, &nrChannels, 0);
-  windowIcon[1].pixels =
-      stbi_load("./data/icons/sgc128.png", &windowIcon[1].width,
-                &windowIcon[1].height, &nrChannels, 0);
-  windowIcon[2].pixels =
-      stbi_load("./data/icons/sgc64.png", &windowIcon[2].width,
-                &windowIcon[2].height, &nrChannels, 0);
-  windowIcon[3].pixels =
-      stbi_load("./data/icons/sgc32.png", &windowIcon[3].width,
-                &windowIcon[3].height, &nrChannels, 0);
+  windowIcon[0].pixels = stbi_load("./data/icons/sgc256.png",
+      &windowIcon[0].width, &windowIcon[0].height, &nrChannels, 0);
+  windowIcon[1].pixels = stbi_load("./data/icons/sgc128.png",
+      &windowIcon[1].width, &windowIcon[1].height, &nrChannels, 0);
+  windowIcon[2].pixels = stbi_load("./data/icons/sgc64.png",
+      &windowIcon[2].width, &windowIcon[2].height, &nrChannels, 0);
+  windowIcon[3].pixels = stbi_load("./data/icons/sgc32.png",
+      &windowIcon[3].width, &windowIcon[3].height, &nrChannels, 0);
 
   glfwSetWindowIcon(window, 4, windowIcon);
 
@@ -134,8 +132,8 @@ SGCEngine::SGCEngine() {
 
   // Loading OpenGL with GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    throw SGCError(SGCErrorType::GLAD_ERROR,
-                   "[GLAD]: Failed to load OpenGL loader.\n");
+    throw SGCError(
+        SGCErrorType::GLAD_ERROR, "[GLAD]: Failed to load OpenGL loader.\n");
 
   // OpenGL Setup
   glViewport(0, 0, 800, 800);
@@ -146,16 +144,20 @@ SGCEngine::SGCEngine() {
 
   // Display VAO setup
   GLfloat displayVertices[] = {
-      // positions
-      -1.0f, -1.0f,  // Bottom Left
-      -1.0f, 1.0f,   // Top Left
-      1.0f,  1.0f,   // Top Right
-      1.0f,  -1.0f,  // Bottom Right
+    // positions
+    -1.0f,
+    -1.0f,  // Bottom Left
+    -1.0f,
+    1.0f,  // Top Left
+    1.0f,
+    1.0f,  // Top Right
+    1.0f,
+    -1.0f,  // Bottom Right
   };
 
   GLuint displayIndices[] = {
-      2, 0, 3,  // Bottom Right
-      2, 1, 0   // Top Left
+    2, 0, 3,  // Bottom Right
+    2, 1, 0   // Top Left
   };
 
   GLuint displayVAO;
@@ -171,14 +173,14 @@ SGCEngine::SGCEngine() {
 
   glBindBuffer(GL_ARRAY_BUFFER, displayVBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(displayVertices), displayVertices,
-               GL_STATIC_DRAW);
+      GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, displayEBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(displayIndices), displayIndices,
-               GL_STATIC_DRAW);
+      GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
-                        (void*)(0));
+  glVertexAttribPointer(
+      0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0));
   glEnableVertexAttribArray(0);
 
   glBindVertexArray(0);
@@ -188,7 +190,7 @@ SGCEngine::SGCEngine() {
   // Shaders setup
   if (!makeShaderProgram())
     throw SGCError(SGCErrorType::OPENGL_ERROR,
-                   "[OpenGL]: Failed to compile shader program.\n");
+        "[OpenGL]: Failed to compile shader program.\n");
 
   // ImGui Setup
   IMGUI_CHECKVERSION();
@@ -230,15 +232,15 @@ bool SGCEngine::makeShaderProgram() {
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &shaderSetupSuccess);
 
   if (!shaderSetupSuccess) {
-    glGetShaderInfoLog(vertexShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
+    glGetShaderInfoLog(
+        vertexShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     return false;
   }
 
   std::string fragmentShaderSourceStr = fragmentShaderSourceStart;
 
   for (const auto& graph : graphs)
-    if (graph.isVisible)
-      fragmentShaderSourceStr += graph.getGraphShaderPart();
+    if (graph.isVisible) fragmentShaderSourceStr += graph.getGraphShaderPart();
 
   fragmentShaderSourceStr += fragmentShaderSourceEnd;
 
@@ -252,7 +254,8 @@ bool SGCEngine::makeShaderProgram() {
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &shaderSetupSuccess);
 
   if (!shaderSetupSuccess) {
-    glGetShaderInfoLog(fragmentShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
+    glGetShaderInfoLog(
+        fragmentShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     glDeleteShader(vertexShader);
     return false;
   }
@@ -267,7 +270,8 @@ bool SGCEngine::makeShaderProgram() {
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &shaderSetupSuccess);
 
   if (!shaderSetupSuccess) {
-    glGetProgramInfoLog(shaderProgram, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
+    glGetProgramInfoLog(
+        shaderProgram, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     return false;
@@ -321,10 +325,8 @@ void SGCEngine::process() {
   if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) positionX += 2.0 / zoom;
   if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) positionX -= 2.0 / zoom;
   if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-      zoom *= 0.99;
-    else
-      zoom *= 1.0 / 0.99;
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) zoom *= 0.99;
+    else zoom *= 1.0 / 0.99;
 }
 
 void SGCEngine::processGUI() {
@@ -387,12 +389,12 @@ void SGCEngine::processGUI() {
     ImGui::Text("SGC version: 1.1.0");
 
     ImGui::TextUnformatted(("WinSize: (" + std::to_string(windowWidth) + ";" +
-                 std::to_string(windowHeight) + ")")
-                    .c_str());
+        std::to_string(windowHeight) + ")")
+            .c_str());
     ImGui::TextUnformatted(("Zoom: " + std::to_string(zoom)).c_str());
     ImGui::TextUnformatted(("Pos: (" + std::to_string(positionX) + ";" +
-                 std::to_string(positionY) + ")")
-                    .c_str());
+        std::to_string(positionY) + ")")
+            .c_str());
 
     double cursorX, cursorY;
     glfwGetCursorPos(window, &cursorX, &cursorY);
@@ -401,17 +403,18 @@ void SGCEngine::processGUI() {
     float worldY = -(cursorY - windowHeight / 2.0) / zoom + positionY;
 
     ImGui::TextUnformatted(("MousePos: (" + std::to_string(worldX) + ";" +
-                 std::to_string(worldY) + ")")
-                    .c_str());
+        std::to_string(worldY) + ")")
+            .c_str());
 
-    ImGui::TextUnformatted(("FPS: " + std::to_string(ImGui::GetIO().Framerate)).c_str());
+    ImGui::TextUnformatted(
+        ("FPS: " + std::to_string(ImGui::GetIO().Framerate)).c_str());
 
     ImGui::End();
   }
 
   if (isGraphsWindowOpen) {
-    ImGui::Begin("Graphs", &isGraphsWindowOpen,
-                 ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin(
+        "Graphs", &isGraphsWindowOpen, ImGuiWindowFlags_AlwaysAutoResize);
 
     if (ImGui::Button("Add graph")) shouldAddGraphPopupOpen = true;
 
@@ -437,23 +440,17 @@ void SGCEngine::processGUI() {
           ImGui::SetItemTooltip("Graph is not valid.");
         }
 
-        if (graphs.at(i).isFunctional)
-          ImGui::Text("Functional");
-        else
-          ImGui::Text("Equational");
+        if (graphs.at(i).isFunctional) ImGui::Text("Functional");
+        else ImGui::Text("Equational");
 
         ImGui::SameLine();
 
-        if (graphs.at(i).isVisible)
-          ImGui::Text("Visible");
-        else
-          ImGui::Text("Invisible");
+        if (graphs.at(i).isVisible) ImGui::Text("Visible");
+        else ImGui::Text("Invisible");
 
         if (graphs.at(i).isFunctional)
           ImGui::TextUnformatted(("y = " + graphs.at(i).body).c_str());
-        else
-          ImGui::TextUnformatted((graphs.at(i).body).c_str());
-
+        else ImGui::TextUnformatted((graphs.at(i).body).c_str());
 
         if (ImGui::Button("Edit")) {
           shouldEditGraphPopupOpen = true;
@@ -492,11 +489,11 @@ void SGCEngine::processGUI() {
     newPosition[1] = positionY;
     ImGui::OpenPopup("Teleport");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-                            ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
   }
 
-  if (ImGui::BeginPopupModal("Teleport", nullptr,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
+  if (ImGui::BeginPopupModal(
+          "Teleport", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::InputFloat2("New Position", newPosition);
 
     if (ImGui::Button("Go")) {
@@ -515,7 +512,7 @@ void SGCEngine::processGUI() {
   if (shouldAddGraphPopupOpen) {
     ImGui::OpenPopup("Add graph");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-                            ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphName); i++) graphName[i] = '\0';
     for (std::size_t i = 0; i < sizeof(graphBody); i++) graphBody[i] = '\0';
     for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0.5;
@@ -523,8 +520,8 @@ void SGCEngine::processGUI() {
     graphIsFunctional = true;
   }
 
-  if (ImGui::BeginPopupModal("Add graph", nullptr,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
+  if (ImGui::BeginPopupModal(
+          "Add graph", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::InputText("Name", graphName, sizeof(graphName));
     ImGui::InputText("Body", graphBody, sizeof(graphBody));
     ImGui::ColorEdit3("Color", graphColor);
@@ -536,12 +533,11 @@ void SGCEngine::processGUI() {
       std::string name(graphName);
       if (validateGraphName(name)) {
         graphs.push_back(Graph(graphIsFunctional, std::move(graphName),
-                               std::string(graphBody), graphColor[0],
-                               graphColor[1], graphColor[2], graphThickness));
+            std::string(graphBody), graphColor[0], graphColor[1], graphColor[2],
+            graphThickness));
         ImGui::CloseCurrentPopup();
         graphs.back().isValid = makeShaderProgram();
-      } else
-        ImGui::CloseCurrentPopup();
+      } else ImGui::CloseCurrentPopup();
     }
 
     ImGui::SameLine();
@@ -554,19 +550,17 @@ void SGCEngine::processGUI() {
   if (shouldEditGraphPopupOpen) {
     ImGui::OpenPopup("Edit graph");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-                            ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphName); i++) graphName[i] = '\0';
     for (std::size_t i = 0; i < sizeof(graphBody); i++) graphBody[i] = '\0';
     for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0.5;
-    for (std::size_t i = 0;
-         i < std::min<std::size_t>(sizeof(graphName),
-                                   graphs.at(editGraphIndex).name.size());
-         i++)
+    for (std::size_t i = 0; i < std::min<std::size_t>(sizeof(graphName),
+                                    graphs.at(editGraphIndex).name.size());
+        i++)
       graphName[i] = graphs.at(editGraphIndex).name.at(i);
-    for (std::size_t i = 0;
-         i < std::min<std::size_t>(sizeof(graphBody),
-                                   graphs.at(editGraphIndex).body.size());
-         i++)
+    for (std::size_t i = 0; i < std::min<std::size_t>(sizeof(graphBody),
+                                    graphs.at(editGraphIndex).body.size());
+        i++)
       graphBody[i] = graphs.at(editGraphIndex).body.at(i);
     graphColor[0] = graphs.at(editGraphIndex).r;
     graphColor[1] = graphs.at(editGraphIndex).g;
@@ -575,8 +569,8 @@ void SGCEngine::processGUI() {
     graphIsFunctional = graphs.at(editGraphIndex).isFunctional;
   }
 
-  if (ImGui::BeginPopupModal("Edit graph", nullptr,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
+  if (ImGui::BeginPopupModal(
+          "Edit graph", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::InputText("Body", graphBody, sizeof(graphBody));
     ImGui::ColorEdit3("Color", graphColor);
     ImGui::DragFloat("Thickness", &graphThickness, 0.1f, 0.2f, 5.0f);
@@ -604,19 +598,19 @@ void SGCEngine::processGUI() {
   if (shouldSaveGraphsPopupOpen) {
     ImGui::OpenPopup("Save graphs");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-                            ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphsSavefileName); i++)
       graphsSavefileName[i] = '\0';
   }
 
-  if (ImGui::BeginPopupModal("Save graphs", nullptr,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
-    ImGui::InputText("Savefile name", graphsSavefileName,
-                     sizeof(graphsSavefileName));
+  if (ImGui::BeginPopupModal(
+          "Save graphs", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::InputText(
+        "Savefile name", graphsSavefileName, sizeof(graphsSavefileName));
 
     if (ImGui::Button("Save")) {
-      mINI::INIFile file("./data/saves/" +
-                         std::string(graphsSavefileName) + ".ini");
+      mINI::INIFile file(
+          "./data/saves/" + std::string(graphsSavefileName) + ".ini");
 
       mINI::INIStructure ini;
 
@@ -645,12 +639,11 @@ void SGCEngine::processGUI() {
   if (shouldLoadGraphsPopupOpen) {
     ImGui::OpenPopup("Load graphs");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-                            ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     graphsSavefiles.clear();
     graphsSavefilesCStr.clear();
 
-    for (const auto& file :
-         std::filesystem::directory_iterator("./data/saves"))
+    for (const auto& file : std::filesystem::directory_iterator("./data/saves"))
       if (std::filesystem::is_regular_file(file))
         graphsSavefiles.push_back(file.path().stem().string());
 
@@ -661,11 +654,11 @@ void SGCEngine::processGUI() {
     graphsSavefileSelected = false;
   }
 
-  if (ImGui::BeginPopupModal("Load graphs", nullptr,
-                             ImGuiWindowFlags_AlwaysAutoResize)) {
-    if (ImGui::BeginListBox(
-            "Savefiles", ImVec2(10.0 * ImGui::GetTextLineHeightWithSpacing(),
-                                5.0 * ImGui::GetTextLineHeightWithSpacing()))) {
+  if (ImGui::BeginPopupModal(
+          "Load graphs", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginListBox("Savefiles",
+            ImVec2(10.0 * ImGui::GetTextLineHeightWithSpacing(),
+                5.0 * ImGui::GetTextLineHeightWithSpacing()))) {
       for (std::size_t i = 0; i < graphsSavefilesCStr.size(); i++) {
         const bool isSelected = graphsSavefilesSelectedItemIndex == i;
 
@@ -684,8 +677,7 @@ void SGCEngine::processGUI() {
       if (graphsSavefileSelected) {
         graphs.clear();
 
-        mINI::INIFile file(
-            "./data/saves/" +
+        mINI::INIFile file("./data/saves/" +
             graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
 
         mINI::INIStructure ini;
@@ -693,11 +685,11 @@ void SGCEngine::processGUI() {
         file.read(ini);
 
         for (auto& graph : ini) {
-          graphs.push_back(Graph(std::stoi(ini[graph.first]["isFunctional"]),
-                                 graph.first, ini[graph.first]["body"],
-                                 std::stof(ini[graph.first]["r"]),
-                                 std::stof(ini[graph.first]["g"]),
-                                 std::stof(ini[graph.first]["b"]), 1.0));
+          graphs.push_back(
+              Graph(std::stoi(ini[graph.first]["isFunctional"]), graph.first,
+                  ini[graph.first]["body"], std::stof(ini[graph.first]["r"]),
+                  std::stof(ini[graph.first]["g"]),
+                  std::stof(ini[graph.first]["b"]), 1.0));
           graphs.back().isVisible = std::stoi(ini[graph.first]["isVisible"]);
           graphs.back().isValid = makeShaderProgram();
         }
@@ -710,8 +702,7 @@ void SGCEngine::processGUI() {
 
     if (ImGui::Button("Delete")) {
       if (graphsSavefileSelected) {
-        std::filesystem::remove(
-            "./data/saves/" +
+        std::filesystem::remove("./data/saves/" +
             graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
         graphsSavefilesSelectedItemIndex = -1;
         graphsSavefileSelected = false;
@@ -750,21 +741,19 @@ void SGCEngine::draw() {
   glUseProgram(shaderProgram);
 
   glUniform2f(windowSizeUniformLocation, static_cast<GLfloat>(windowWidth),
-              static_cast<GLfloat>(windowHeight));
+      static_cast<GLfloat>(windowHeight));
   glUniform2f(positionUniformLocation, positionX, positionY);
   glUniform1f(zoomUniformLocation, zoom);
-  glUniform1f(
-      sublinePeriodUniformLocation,
+  glUniform1f(sublinePeriodUniformLocation,
       std::pow(10.0,
-               std::round(std::log10(std::max<float>((float)(windowWidth),
-                                                     (float)(windowHeight)) /
-                                     zoom))));
-  glUniform1f(
-      microlinePeriodUniformLocation,
+          std::round(std::log10(
+              std::max<float>((float)(windowWidth), (float)(windowHeight)) /
+              zoom))));
+  glUniform1f(microlinePeriodUniformLocation,
       std::pow(10.0,
-               std::round(std::log10(std::max<float>((float)(windowWidth),
-                                                     (float)(windowHeight)) /
-                                     zoom / 10.0))));
+          std::round(std::log10(
+              std::max<float>((float)(windowWidth), (float)(windowHeight)) /
+              zoom / 10.0))));
   glUniform1f(timeUniformLocation, ImGui::GetTime());
 
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -795,8 +784,7 @@ void SGCEngine::scrollCallback(double offsetX, double offsetY) {
     positionY += worldY - (-(cursorY - windowHeight / 2.0) / zoom + offsetY);
   } else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     positionX += offsetY / zoom * 50.0;
-  else
-    positionY += offsetY / zoom * 50.0;
+  else positionY += offsetY / zoom * 50.0;
   positionX += offsetX / zoom * 50.0;
 }
 

@@ -1,5 +1,6 @@
-#include <SGC/sgc.hpp>
 #include <iostream>
+
+#include "sgc.hpp"
 
 int main() {
   try {
