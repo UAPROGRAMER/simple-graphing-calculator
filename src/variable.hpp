@@ -10,8 +10,8 @@ public:
   float step;
   float value;
 
-  Variable(std::string name, float maxValue, float minValue, float step,
-      float value);
+  Variable(
+    std::string name, float maxValue, float minValue, float step, float value);
 
   std::string getVariableShaderPart() const;
 };

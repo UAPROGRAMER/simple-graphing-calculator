@@ -15,7 +15,7 @@ public:
   bool isVisible = true;
 
   Graph(bool isFunctional, std::string name, std::string body, float r, float g,
-      float b, float thickness);
+    float b, float thickness);
 
   std::string getGraphShaderPart() const;
 };

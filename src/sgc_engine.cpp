@@ -13,56 +13,56 @@
 #include "opengl.hpp"
 #include "utils.hpp"
 
-const GLchar* vertexShaderSource =                   //
-    "#version 330 core\n"                            //
-    "layout (location = 0) in vec2 attribPos;"       //
-    "out vec2 fragPos;"                              //
-    "void main() {"                                  //
-    "  gl_Position = vec4(attribPos.xy, 0.0, 1.0);"  //
-    "  fragPos = attribPos;"                         //
-    "}";
+const GLchar* vertexShaderSource =                 //
+  "#version 330 core\n"                            //
+  "layout (location = 0) in vec2 attribPos;"       //
+  "out vec2 fragPos;"                              //
+  "void main() {"                                  //
+  "  gl_Position = vec4(attribPos.xy, 0.0, 1.0);"  //
+  "  fragPos = attribPos;"                         //
+  "}";
 
-const std::string fragmentShaderSourceStart =                               //
-    "#version 330 core\n"                                                   //
-    "#define pi 3.1415927410125732\n"                                       //
-    "in vec2 fragPos;"                                                      //
-    "out vec4 FragColor;"                                                   //
-    "uniform vec2 windowSize;"                                              //
-    "uniform vec2 position;"                                                //
-    "uniform float zoom;"                                                   //
-    "uniform float sublinePeriod;"                                          //
-    "uniform float microlinePeriod;"                                        //
-    "uniform float t;"                                                      //
-    "bool isEqualApprox(float a, float b, float c) {"                       //
-    "  return abs(a - b) <= c * 0.5;"                                       //
-    "}"                                                                     //
-    "void main() {"                                                         //
-    "  float pixelSize = 1.0 / zoom;"                                       //
-    "  vec2 worldPos = (windowSize * 0.5 * fragPos)"                        //
-    "    * pixelSize + position;"                                           //
-    "  vec2 pixelSublinePeriod ="                                           //
-    "    (worldPos / sublinePeriod - round(worldPos / sublinePeriod))"      //
-    "    * sublinePeriod;"                                                  //
-    "  vec2 pixelMicrolinePeriod ="                                         //
-    "    (worldPos / microlinePeriod - round(worldPos / microlinePeriod))"  //
-    "    * microlinePeriod;"                                                //
-    "  float x = worldPos.x;"                                               //
-    "  float y = worldPos.y;"                                               //
-    "  float ps = pixelSize;";
+const std::string fragmentShaderSourceStart =                             //
+  "#version 330 core\n"                                                   //
+  "#define pi 3.1415927410125732\n"                                       //
+  "in vec2 fragPos;"                                                      //
+  "out vec4 FragColor;"                                                   //
+  "uniform vec2 windowSize;"                                              //
+  "uniform vec2 position;"                                                //
+  "uniform float zoom;"                                                   //
+  "uniform float sublinePeriod;"                                          //
+  "uniform float microlinePeriod;"                                        //
+  "uniform float t;"                                                      //
+  "bool isEqualApprox(float a, float b, float c) {"                       //
+  "  return abs(a - b) <= c * 0.5;"                                       //
+  "}"                                                                     //
+  "void main() {"                                                         //
+  "  float pixelSize = 1.0 / zoom;"                                       //
+  "  vec2 worldPos = (windowSize * 0.5 * fragPos)"                        //
+  "    * pixelSize + position;"                                           //
+  "  vec2 pixelSublinePeriod ="                                           //
+  "    (worldPos / sublinePeriod - round(worldPos / sublinePeriod))"      //
+  "    * sublinePeriod;"                                                  //
+  "  vec2 pixelMicrolinePeriod ="                                         //
+  "    (worldPos / microlinePeriod - round(worldPos / microlinePeriod))"  //
+  "    * microlinePeriod;"                                                //
+  "  float x = worldPos.x;"                                               //
+  "  float y = worldPos.y;"                                               //
+  "  float ps = pixelSize;";
 
-const std::string fragmentShaderSourceEnd =                                //
-    "  if (isEqualApprox(worldPos.x, 0.0, pixelSize) ||"                   //
-    "    isEqualApprox(worldPos.y, 0.0, pixelSize))"                       //
-    "    FragColor = vec4(0.0, 0.0, 0.0, 1.0);"                            //
-    "  else if (isEqualApprox(pixelSublinePeriod.x, 0.0, pixelSize) ||"    //
-    "    isEqualApprox(pixelSublinePeriod.y, 0.0, pixelSize))"             //
-    "    FragColor = vec4(0.65, 0.65, 0.65, 1.0);"                         //
-    "  else if (isEqualApprox(pixelMicrolinePeriod.x, 0.0, pixelSize) ||"  //
-    "    isEqualApprox(pixelMicrolinePeriod.y, 0.0, pixelSize))"           //
-    "    FragColor = vec4(0.85, 0.85, 0.85, 1.0);"                         //
-    "  else"                                                               //
-    "    FragColor = vec4(1.0, 1.0, 1.0, 1.0);"                            //
-    "}";
+const std::string fragmentShaderSourceEnd =                              //
+  "  if (isEqualApprox(worldPos.x, 0.0, pixelSize) ||"                   //
+  "    isEqualApprox(worldPos.y, 0.0, pixelSize))"                       //
+  "    FragColor = vec4(0.0, 0.0, 0.0, 1.0);"                            //
+  "  else if (isEqualApprox(pixelSublinePeriod.x, 0.0, pixelSize) ||"    //
+  "    isEqualApprox(pixelSublinePeriod.y, 0.0, pixelSize))"             //
+  "    FragColor = vec4(0.65, 0.65, 0.65, 1.0);"                         //
+  "  else if (isEqualApprox(pixelMicrolinePeriod.x, 0.0, pixelSize) ||"  //
+  "    isEqualApprox(pixelMicrolinePeriod.y, 0.0, pixelSize))"           //
+  "    FragColor = vec4(0.85, 0.85, 0.85, 1.0);"                         //
+  "  else"                                                               //
+  "    FragColor = vec4(1.0, 1.0, 1.0, 1.0);"                            //
+  "}";
 
 SGCEngine* activeEngine = nullptr;
 
@@ -96,24 +96,24 @@ SGCEngine::SGCEngine() {
   glfwWindowHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
 #endif
 
-  window = glfwCreateWindow(
-      800, 800, "Simple Graphing Calculator", nullptr, nullptr);
+  window =
+    glfwCreateWindow(800, 800, "Simple Graphing Calculator", nullptr, nullptr);
 
   if (!window)
     throw SGCError(
-        SGCErrorType::GLFW_ERROR, "[GLFW]: Failed to create window.\n");
+      SGCErrorType::GLFW_ERROR, "[GLFW]: Failed to create window.\n");
 
   // GLFW Setup
   GLFWimage windowIcon[4];
   int nrChannels;
   windowIcon[0].pixels = stbi_load("./data/icons/sgc256.png",
-      &windowIcon[0].width, &windowIcon[0].height, &nrChannels, 0);
+    &windowIcon[0].width, &windowIcon[0].height, &nrChannels, 0);
   windowIcon[1].pixels = stbi_load("./data/icons/sgc128.png",
-      &windowIcon[1].width, &windowIcon[1].height, &nrChannels, 0);
+    &windowIcon[1].width, &windowIcon[1].height, &nrChannels, 0);
   windowIcon[2].pixels = stbi_load("./data/icons/sgc64.png",
-      &windowIcon[2].width, &windowIcon[2].height, &nrChannels, 0);
+    &windowIcon[2].width, &windowIcon[2].height, &nrChannels, 0);
   windowIcon[3].pixels = stbi_load("./data/icons/sgc32.png",
-      &windowIcon[3].width, &windowIcon[3].height, &nrChannels, 0);
+    &windowIcon[3].width, &windowIcon[3].height, &nrChannels, 0);
 
   glfwSetWindowIcon(window, 4, windowIcon);
 
@@ -133,7 +133,7 @@ SGCEngine::SGCEngine() {
   // Loading OpenGL with GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     throw SGCError(
-        SGCErrorType::GLAD_ERROR, "[GLAD]: Failed to load OpenGL loader.\n");
+      SGCErrorType::GLAD_ERROR, "[GLAD]: Failed to load OpenGL loader.\n");
 
   // OpenGL Setup
   glViewport(0, 0, 800, 800);
@@ -172,15 +172,15 @@ SGCEngine::SGCEngine() {
   glBindVertexArray(displayVAO);
 
   glBindBuffer(GL_ARRAY_BUFFER, displayVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(displayVertices), displayVertices,
-      GL_STATIC_DRAW);
+  glBufferData(
+    GL_ARRAY_BUFFER, sizeof(displayVertices), displayVertices, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, displayEBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(displayIndices), displayIndices,
-      GL_STATIC_DRAW);
+    GL_STATIC_DRAW);
 
   glVertexAttribPointer(
-      0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0));
+    0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(0));
   glEnableVertexAttribArray(0);
 
   glBindVertexArray(0);
@@ -190,7 +190,7 @@ SGCEngine::SGCEngine() {
   // Shaders setup
   if (!makeShaderProgram())
     throw SGCError(SGCErrorType::OPENGL_ERROR,
-        "[OpenGL]: Failed to compile shader program.\n");
+      "[OpenGL]: Failed to compile shader program.\n");
 
   // ImGui Setup
   IMGUI_CHECKVERSION();
@@ -233,7 +233,7 @@ bool SGCEngine::makeShaderProgram() {
 
   if (!shaderSetupSuccess) {
     glGetShaderInfoLog(
-        vertexShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
+      vertexShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     return false;
   }
 
@@ -255,7 +255,7 @@ bool SGCEngine::makeShaderProgram() {
 
   if (!shaderSetupSuccess) {
     glGetShaderInfoLog(
-        fragmentShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
+      fragmentShader, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     glDeleteShader(vertexShader);
     return false;
   }
@@ -271,7 +271,7 @@ bool SGCEngine::makeShaderProgram() {
 
   if (!shaderSetupSuccess) {
     glGetProgramInfoLog(
-        shaderProgram, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
+      shaderProgram, GL_INFO_LOG_LENGTH, nullptr, shaderSetupInfoLog);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     return false;
@@ -288,9 +288,9 @@ bool SGCEngine::makeShaderProgram() {
   positionUniformLocation = glGetUniformLocation(shaderProgram, "position");
   zoomUniformLocation = glGetUniformLocation(shaderProgram, "zoom");
   sublinePeriodUniformLocation =
-      glGetUniformLocation(shaderProgram, "sublinePeriod");
+    glGetUniformLocation(shaderProgram, "sublinePeriod");
   microlinePeriodUniformLocation =
-      glGetUniformLocation(shaderProgram, "microlinePeriod");
+    glGetUniformLocation(shaderProgram, "microlinePeriod");
   timeUniformLocation = glGetUniformLocation(shaderProgram, "t");
 
   return true;
@@ -389,12 +389,12 @@ void SGCEngine::processGUI() {
     ImGui::Text("SGC version: 1.1.0");
 
     ImGui::TextUnformatted(("WinSize: (" + std::to_string(windowWidth) + ";" +
-        std::to_string(windowHeight) + ")")
-            .c_str());
+      std::to_string(windowHeight) + ")")
+        .c_str());
     ImGui::TextUnformatted(("Zoom: " + std::to_string(zoom)).c_str());
     ImGui::TextUnformatted(("Pos: (" + std::to_string(positionX) + ";" +
-        std::to_string(positionY) + ")")
-            .c_str());
+      std::to_string(positionY) + ")")
+        .c_str());
 
     double cursorX, cursorY;
     glfwGetCursorPos(window, &cursorX, &cursorY);
@@ -403,18 +403,18 @@ void SGCEngine::processGUI() {
     float worldY = -(cursorY - windowHeight / 2.0) / zoom + positionY;
 
     ImGui::TextUnformatted(("MousePos: (" + std::to_string(worldX) + ";" +
-        std::to_string(worldY) + ")")
-            .c_str());
+      std::to_string(worldY) + ")")
+        .c_str());
 
     ImGui::TextUnformatted(
-        ("FPS: " + std::to_string(ImGui::GetIO().Framerate)).c_str());
+      ("FPS: " + std::to_string(ImGui::GetIO().Framerate)).c_str());
 
     ImGui::End();
   }
 
   if (isGraphsWindowOpen) {
     ImGui::Begin(
-        "Graphs", &isGraphsWindowOpen, ImGuiWindowFlags_AlwaysAutoResize);
+      "Graphs", &isGraphsWindowOpen, ImGuiWindowFlags_AlwaysAutoResize);
 
     if (ImGui::Button("Add graph")) shouldAddGraphPopupOpen = true;
 
@@ -489,11 +489,11 @@ void SGCEngine::processGUI() {
     newPosition[1] = positionY;
     ImGui::OpenPopup("Teleport");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+      ImGuiCond_Appearing, ImVec2(0.5, 0.5));
   }
 
   if (ImGui::BeginPopupModal(
-          "Teleport", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        "Teleport", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::InputFloat2("New Position", newPosition);
 
     if (ImGui::Button("Go")) {
@@ -512,7 +512,7 @@ void SGCEngine::processGUI() {
   if (shouldAddGraphPopupOpen) {
     ImGui::OpenPopup("Add graph");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+      ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphName); i++) graphName[i] = '\0';
     for (std::size_t i = 0; i < sizeof(graphBody); i++) graphBody[i] = '\0';
     for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0.5;
@@ -521,7 +521,7 @@ void SGCEngine::processGUI() {
   }
 
   if (ImGui::BeginPopupModal(
-          "Add graph", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        "Add graph", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::InputText("Name", graphName, sizeof(graphName));
     ImGui::InputText("Body", graphBody, sizeof(graphBody));
     ImGui::ColorEdit3("Color", graphColor);
@@ -532,9 +532,9 @@ void SGCEngine::processGUI() {
     if (ImGui::Button("Add")) {
       std::string name(graphName);
       if (validateGraphName(name)) {
-        graphs.push_back(Graph(graphIsFunctional, std::move(graphName),
-            std::string(graphBody), graphColor[0], graphColor[1], graphColor[2],
-            graphThickness));
+        graphs.push_back(
+          Graph(graphIsFunctional, std::move(graphName), std::string(graphBody),
+            graphColor[0], graphColor[1], graphColor[2], graphThickness));
         ImGui::CloseCurrentPopup();
         graphs.back().isValid = makeShaderProgram();
       } else ImGui::CloseCurrentPopup();
@@ -550,17 +550,17 @@ void SGCEngine::processGUI() {
   if (shouldEditGraphPopupOpen) {
     ImGui::OpenPopup("Edit graph");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+      ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphName); i++) graphName[i] = '\0';
     for (std::size_t i = 0; i < sizeof(graphBody); i++) graphBody[i] = '\0';
     for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0.5;
     for (std::size_t i = 0; i < std::min<std::size_t>(sizeof(graphName),
-                                    graphs.at(editGraphIndex).name.size());
-        i++)
+                                  graphs.at(editGraphIndex).name.size());
+      i++)
       graphName[i] = graphs.at(editGraphIndex).name.at(i);
     for (std::size_t i = 0; i < std::min<std::size_t>(sizeof(graphBody),
-                                    graphs.at(editGraphIndex).body.size());
-        i++)
+                                  graphs.at(editGraphIndex).body.size());
+      i++)
       graphBody[i] = graphs.at(editGraphIndex).body.at(i);
     graphColor[0] = graphs.at(editGraphIndex).r;
     graphColor[1] = graphs.at(editGraphIndex).g;
@@ -570,7 +570,7 @@ void SGCEngine::processGUI() {
   }
 
   if (ImGui::BeginPopupModal(
-          "Edit graph", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        "Edit graph", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::InputText("Body", graphBody, sizeof(graphBody));
     ImGui::ColorEdit3("Color", graphColor);
     ImGui::DragFloat("Thickness", &graphThickness, 0.1f, 0.2f, 5.0f);
@@ -598,19 +598,19 @@ void SGCEngine::processGUI() {
   if (shouldSaveGraphsPopupOpen) {
     ImGui::OpenPopup("Save graphs");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+      ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphsSavefileName); i++)
       graphsSavefileName[i] = '\0';
   }
 
   if (ImGui::BeginPopupModal(
-          "Save graphs", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        "Save graphs", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     ImGui::InputText(
-        "Savefile name", graphsSavefileName, sizeof(graphsSavefileName));
+      "Savefile name", graphsSavefileName, sizeof(graphsSavefileName));
 
     if (ImGui::Button("Save")) {
       mINI::INIFile file(
-          "./data/saves/" + std::string(graphsSavefileName) + ".ini");
+        "./data/saves/" + std::string(graphsSavefileName) + ".ini");
 
       mINI::INIStructure ini;
 
@@ -639,13 +639,15 @@ void SGCEngine::processGUI() {
   if (shouldLoadGraphsPopupOpen) {
     ImGui::OpenPopup("Load graphs");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
-        ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+      ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     graphsSavefiles.clear();
     graphsSavefilesCStr.clear();
 
     for (const auto& file : std::filesystem::directory_iterator("./data/saves"))
       if (std::filesystem::is_regular_file(file))
         graphsSavefiles.push_back(file.path().stem().string());
+
+    std::sort(graphsSavefiles.begin(), graphsSavefiles.end());
 
     for (const auto& file : graphsSavefiles)
       graphsSavefilesCStr.push_back(file.c_str());
@@ -655,10 +657,10 @@ void SGCEngine::processGUI() {
   }
 
   if (ImGui::BeginPopupModal(
-          "Load graphs", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        "Load graphs", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
     if (ImGui::BeginListBox("Savefiles",
-            ImVec2(10.0 * ImGui::GetTextLineHeightWithSpacing(),
-                5.0 * ImGui::GetTextLineHeightWithSpacing()))) {
+          ImVec2(10.0 * ImGui::GetTextLineHeightWithSpacing(),
+            5.0 * ImGui::GetTextLineHeightWithSpacing()))) {
       for (std::size_t i = 0; i < graphsSavefilesCStr.size(); i++) {
         const bool isSelected = graphsSavefilesSelectedItemIndex == i;
 
@@ -678,18 +680,17 @@ void SGCEngine::processGUI() {
         graphs.clear();
 
         mINI::INIFile file("./data/saves/" +
-            graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
+          graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
 
         mINI::INIStructure ini;
 
         file.read(ini);
 
         for (auto& graph : ini) {
-          graphs.push_back(
-              Graph(std::stoi(ini[graph.first]["isFunctional"]), graph.first,
-                  ini[graph.first]["body"], std::stof(ini[graph.first]["r"]),
-                  std::stof(ini[graph.first]["g"]),
-                  std::stof(ini[graph.first]["b"]), 1.0));
+          graphs.push_back(Graph(std::stoi(ini[graph.first]["isFunctional"]),
+            graph.first, ini[graph.first]["body"],
+            std::stof(ini[graph.first]["r"]), std::stof(ini[graph.first]["g"]),
+            std::stof(ini[graph.first]["b"]), 1.0));
           graphs.back().isVisible = std::stoi(ini[graph.first]["isVisible"]);
           graphs.back().isValid = makeShaderProgram();
         }
@@ -703,7 +704,7 @@ void SGCEngine::processGUI() {
     if (ImGui::Button("Delete")) {
       if (graphsSavefileSelected) {
         std::filesystem::remove("./data/saves/" +
-            graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
+          graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
         graphsSavefilesSelectedItemIndex = -1;
         graphsSavefileSelected = false;
 
@@ -711,7 +712,7 @@ void SGCEngine::processGUI() {
         graphsSavefilesCStr.clear();
 
         for (const auto& file :
-            std::filesystem::directory_iterator("./data/saves"))
+          std::filesystem::directory_iterator("./data/saves"))
           if (std::filesystem::is_regular_file(file))
             graphsSavefiles.push_back(file.path().stem().string());
 
@@ -741,19 +742,18 @@ void SGCEngine::draw() {
   glUseProgram(shaderProgram);
 
   glUniform2f(windowSizeUniformLocation, static_cast<GLfloat>(windowWidth),
-      static_cast<GLfloat>(windowHeight));
+    static_cast<GLfloat>(windowHeight));
   glUniform2f(positionUniformLocation, positionX, positionY);
   glUniform1f(zoomUniformLocation, zoom);
   glUniform1f(sublinePeriodUniformLocation,
-      std::pow(10.0,
-          std::round(std::log10(
-              std::max<float>((float)(windowWidth), (float)(windowHeight)) /
-              zoom))));
+    std::pow(10.0,
+      std::round(std::log10(
+        std::max<float>((float)(windowWidth), (float)(windowHeight)) / zoom))));
   glUniform1f(microlinePeriodUniformLocation,
-      std::pow(10.0,
-          std::round(std::log10(
-              std::max<float>((float)(windowWidth), (float)(windowHeight)) /
-              zoom / 10.0))));
+    std::pow(10.0,
+      std::round(std::log10(
+        std::max<float>((float)(windowWidth), (float)(windowHeight)) / zoom /
+        10.0))));
   glUniform1f(timeUniformLocation, ImGui::GetTime());
 
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

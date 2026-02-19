@@ -16,8 +16,8 @@ private:
   int windowWidth = 800;
   int windowHeight = 800;
 
-  GLfloat positionX = 0.0;
-  GLfloat positionY = 0.0;
+  GLfloat positionX = 0.000001;
+  GLfloat positionY = 0.000001;
 
   GLfloat zoom = 200.0;
 
