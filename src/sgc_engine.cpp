@@ -12,6 +12,7 @@
 #include "mINI.hpp"
 #include "opengl.hpp"
 #include "utils.hpp"
+#include "variable.hpp"
 
 const GLchar* vertexShaderSource =                 //
   "#version 330 core\n"                            //
@@ -22,17 +23,20 @@ const GLchar* vertexShaderSource =                 //
   "  fragPos = attribPos;"                         //
   "}";
 
-const std::string fragmentShaderSourceStart =                             //
-  "#version 330 core\n"                                                   //
-  "#define pi 3.1415927410125732\n"                                       //
-  "in vec2 fragPos;"                                                      //
-  "out vec4 FragColor;"                                                   //
-  "uniform vec2 windowSize;"                                              //
-  "uniform vec2 position;"                                                //
-  "uniform float zoom;"                                                   //
-  "uniform float sublinePeriod;"                                          //
-  "uniform float microlinePeriod;"                                        //
-  "uniform float t;"                                                      //
+const std::string fragmentShaderSourceStart =     //
+  "#version 330 core\n"                           //
+  "#define pi 3.1415927410125732\n"               //
+  "#define approx(a,b,c) isEqualApprox(a,b,c)\n"  //
+  "in vec2 fragPos;"                              //
+  "out vec4 FragColor;"                           //
+  "uniform vec2 windowSize;"                      //
+  "uniform vec2 position;"                        //
+  "uniform float zoom;"                           //
+  "uniform float sublinePeriod;"                  //
+  "uniform float microlinePeriod;"                //
+  "uniform float t;";
+
+const std::string fragmentShaderSourceCenter =
   "bool isEqualApprox(float a, float b, float c) {"                       //
   "  return abs(a - b) <= c * 0.5;"                                       //
   "}"                                                                     //
@@ -239,6 +243,11 @@ bool SGCEngine::makeShaderProgram() {
 
   std::string fragmentShaderSourceStr = fragmentShaderSourceStart;
 
+  for (const auto& variable : variables)
+    fragmentShaderSourceStr += variable.getVariableShaderPart();
+
+  fragmentShaderSourceStr += fragmentShaderSourceCenter;
+
   for (const auto& graph : graphs)
     if (graph.isVisible) fragmentShaderSourceStr += graph.getGraphShaderPart();
 
@@ -332,20 +341,32 @@ void SGCEngine::process() {
 void SGCEngine::processGUI() {
   static bool isInfoWindowOpen = false;
   static bool isGraphsWindowOpen = false;
+  static bool isVariablesWindowOpen = false;
   bool shouldTeleportPopupOpen = false;
   bool shouldAddGraphPopupOpen = false;
   bool shouldEditGraphPopupOpen = false;
   bool shouldSaveGraphsPopupOpen = false;
   bool shouldLoadGraphsPopupOpen = false;
+  bool shouldAddVariablePopupOpen = false;
+  bool shouldEditVariablePopupOpen = false;
   static std::size_t editGraphIndex = 0;
+  static std::size_t editVariableIndex = 0;
   static float newPosition[2];
   static char graphName[33];
   static char graphBody[129];
   static float graphColor[3] = {0.5};
   static float graphThickness = 1.0;
   static bool graphIsFunctional = true;
+
+  static char variableName[33];
+  static float variableMaxValue = 10.0;
+  static float variableMinValue = 0.0;
+  static float variableStep = 0.1;
+
   bool isGraphToRemove = false;
   std::size_t graphToRemoveIndex = 0;
+  bool isVariableToRemove = false;
+  std::size_t variableToRemoveIndex = 0;
   static char graphsSavefileName[33];
   static std::vector<std::string> graphsSavefiles;
   static std::vector<const char*> graphsSavefilesCStr;
@@ -360,18 +381,28 @@ void SGCEngine::processGUI() {
     return true;
   };
 
+  static auto validateVariableName = [this](const std::string& name) -> bool {
+    if (name.empty()) return false;
+    for (const auto& variable : variables) {
+      if (name == variable.name) return false;
+    }
+    return isValidId(name);
+  };
+
   ImGui::BeginMainMenuBar();
 
   if (ImGui::BeginMenu("Windows")) {
     if (ImGui::MenuItem("Info")) isInfoWindowOpen = !isInfoWindowOpen;
     if (ImGui::MenuItem("Graphs")) isGraphsWindowOpen = !isGraphsWindowOpen;
+    if (ImGui::MenuItem("Variables"))
+      isVariablesWindowOpen = !isVariablesWindowOpen;
     ImGui::EndMenu();
   }
 
   if (ImGui::BeginMenu("Tools")) {
     if (ImGui::MenuItem("Center pos")) {
-      positionX = 0.0;
-      positionY = 0.0;
+      positionX = 0.000001;
+      positionY = 0.000001;
     }
 
     if (ImGui::MenuItem("Normalize zoom")) zoom = 200.0;
@@ -386,7 +417,7 @@ void SGCEngine::processGUI() {
   if (isInfoWindowOpen) {
     ImGui::Begin("Info", &isInfoWindowOpen, ImGuiWindowFlags_AlwaysAutoResize);
 
-    ImGui::Text("SGC version: 1.1.0");
+    ImGui::Text("SGC version: 1.2.0");
 
     ImGui::TextUnformatted(("WinSize: (" + std::to_string(windowWidth) + ";" +
       std::to_string(windowHeight) + ")")
@@ -484,6 +515,48 @@ void SGCEngine::processGUI() {
     ImGui::End();
   }
 
+  if (isVariablesWindowOpen) {
+    ImGui::Begin(
+      "Variables", &isVariablesWindowOpen, ImGuiWindowFlags_AlwaysAutoResize);
+
+    if (ImGui::Button("Add variables")) shouldAddVariablePopupOpen = true;
+
+    ImGui::Text("Variables:");
+
+    for (std::size_t i = 0; i < variables.size(); i++) {
+      bool opened = false;
+
+      if (ImGui::TreeNode(variables.at(i).name.c_str())) {
+        ImGui::Text(
+          ("Max value: " + std::to_string(variables.at(i).maxValue)).c_str());
+
+        ImGui::Text(
+          ("Min value: " + std::to_string(variables.at(i).minValue)).c_str());
+
+        ImGui::Text(("Step: " + std::to_string(variables.at(i).step)).c_str());
+
+        ImGui::DragFloat("Value", &variables.at(i).value, variables.at(i).step,
+          variables.at(i).minValue, variables.at(i).maxValue);
+
+        if (ImGui::Button("Edit")) {
+          shouldEditVariablePopupOpen = true;
+          editVariableIndex = i;
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Delete")) {
+          isVariableToRemove = true;
+          variableToRemoveIndex = i;
+        }
+
+        ImGui::TreePop();
+      }
+    }
+
+    ImGui::End();
+  }
+
   if (shouldTeleportPopupOpen) {
     newPosition[0] = positionX;
     newPosition[1] = positionY;
@@ -497,8 +570,8 @@ void SGCEngine::processGUI() {
     ImGui::InputFloat2("New Position", newPosition);
 
     if (ImGui::Button("Go")) {
-      positionX = newPosition[0];
-      positionY = newPosition[1];
+      positionX = newPosition[0] + 0.000001;
+      positionY = newPosition[1] + 0.000001;
       ImGui::CloseCurrentPopup();
     }
 
@@ -515,7 +588,7 @@ void SGCEngine::processGUI() {
       ImGuiCond_Appearing, ImVec2(0.5, 0.5));
     for (std::size_t i = 0; i < sizeof(graphName); i++) graphName[i] = '\0';
     for (std::size_t i = 0; i < sizeof(graphBody); i++) graphBody[i] = '\0';
-    for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0.5;
+    for (std::size_t i = 0; i < 3; i++) graphColor[i] = 0;
     graphThickness = 1.0;
     graphIsFunctional = true;
   }
@@ -537,6 +610,44 @@ void SGCEngine::processGUI() {
             graphColor[0], graphColor[1], graphColor[2], graphThickness));
         ImGui::CloseCurrentPopup();
         graphs.back().isValid = makeShaderProgram();
+      } else ImGui::CloseCurrentPopup();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+
+    ImGui::EndPopup();
+  }
+
+  if (shouldAddVariablePopupOpen) {
+    ImGui::OpenPopup("Add variable");
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
+      ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+    for (std::size_t i = 0; i < sizeof(variableName); i++)
+      variableName[i] = '\0';
+    variableMaxValue = 10.0;
+    variableMinValue = 0.0;
+    variableStep = 0.1;
+  }
+
+  if (ImGui::BeginPopupModal(
+        "Add variable", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::InputText("Name", variableName, sizeof(variableName));
+    ImGui::DragFloat("Max value", &variableMaxValue, 0.1, -100000, 100000);
+    ImGui::DragFloat("Min value", &variableMinValue, 0.1, -100000, 100000);
+    ImGui::DragFloat("Step", &variableStep, 0.001, -100, 100);
+
+    if (variableMinValue > variableMaxValue)
+      variableMaxValue = variableMinValue;
+
+    if (ImGui::Button("Add")) {
+      std::string name(variableName);
+      if (validateVariableName(name)) {
+        variables.push_back(Variable(name, variableMaxValue, variableMinValue,
+          variableStep, variableMinValue));
+        ImGui::CloseCurrentPopup();
+        makeShaderProgram();
       } else ImGui::CloseCurrentPopup();
     }
 
@@ -595,6 +706,36 @@ void SGCEngine::processGUI() {
     ImGui::EndPopup();
   }
 
+  if (shouldEditVariablePopupOpen) {
+    ImGui::OpenPopup("Edit variable");
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
+      ImGuiCond_Appearing, ImVec2(0.5, 0.5));
+    variableMaxValue = variables.at(editVariableIndex).maxValue;
+    variableMinValue = variables.at(editVariableIndex).minValue;
+    variableStep = variables.at(editVariableIndex).step;
+  }
+
+  if (ImGui::BeginPopupModal(
+        "Edit variable", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::DragFloat("Max value", &variableMaxValue, 0.1, -100000, 100000);
+    ImGui::DragFloat("Min value", &variableMinValue, 0.1, -100000, 100000);
+    ImGui::DragFloat("Step", &variableStep, 0.001, -100, 100);
+
+    if (ImGui::Button("Confirm")) {
+      variables.at(editVariableIndex).maxValue = variableMaxValue;
+      variables.at(editVariableIndex).minValue = variableMinValue;
+      variables.at(editVariableIndex).step = variableStep;
+      ImGui::CloseCurrentPopup();
+      makeShaderProgram();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+
+    ImGui::EndPopup();
+  }
+
   if (shouldSaveGraphsPopupOpen) {
     ImGui::OpenPopup("Save graphs");
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(),
@@ -613,6 +754,17 @@ void SGCEngine::processGUI() {
         "./data/saves/" + std::string(graphsSavefileName) + ".ini");
 
       mINI::INIStructure ini;
+
+      ini["variables"];
+
+      for (const auto& variable : variables) {
+        ini[variable.name]["maxValue"] = std::to_string(variable.maxValue);
+        ini[variable.name]["minValue"] = std::to_string(variable.minValue);
+        ini[variable.name]["step"] = std::to_string(variable.step);
+        ini[variable.name]["value"] = std::to_string(variable.value);
+      }
+
+      ini["graphs"];
 
       for (const auto& graph : graphs) {
         ini[graph.name]["body"] = graph.body;
@@ -678,6 +830,7 @@ void SGCEngine::processGUI() {
     if (ImGui::Button("Load")) {
       if (graphsSavefileSelected) {
         graphs.clear();
+        variables.clear();
 
         mINI::INIFile file("./data/saves/" +
           graphsSavefiles.at(graphsSavefilesSelectedItemIndex) + ".ini");
@@ -686,13 +839,36 @@ void SGCEngine::processGUI() {
 
         file.read(ini);
 
-        for (auto& graph : ini) {
-          graphs.push_back(Graph(std::stoi(ini[graph.first]["isFunctional"]),
-            graph.first, ini[graph.first]["body"],
-            std::stof(ini[graph.first]["r"]), std::stof(ini[graph.first]["g"]),
-            std::stof(ini[graph.first]["b"]), 1.0));
-          graphs.back().isVisible = std::stoi(ini[graph.first]["isVisible"]);
-          graphs.back().isValid = makeShaderProgram();
+        bool loadingValiables = true;
+
+        for (auto& section : ini) {
+          if (section.first == "variables") {
+            loadingValiables = true;
+            continue;
+          }
+
+          if (section.first == "graphs") {
+            loadingValiables = false;
+            continue;
+          }
+
+          if (loadingValiables) {
+            variables.push_back(
+              Variable(section.first, std::stof(ini[section.first]["maxValue"]),
+                std::stof(ini[section.first]["minValue"]),
+                std::stof(ini[section.first]["step"]),
+                std::stof(ini[section.first]["value"])));
+          } else {
+            graphs.push_back(Graph(
+              std::stoi(ini[section.first]["isFunctional"]), section.first,
+              ini[section.first]["body"], std::stof(ini[section.first]["r"]),
+              std::stof(ini[section.first]["g"]),
+              std::stof(ini[section.first]["b"]),
+              std::stof(ini[section.first]["thickness"])));
+            graphs.back().isVisible =
+              std::stoi(ini[section.first]["isVisible"]);
+            graphs.back().isValid = makeShaderProgram();
+          }
         }
       }
 
@@ -732,6 +908,11 @@ void SGCEngine::processGUI() {
     graphs.erase(graphs.begin() + graphToRemoveIndex);
     makeShaderProgram();
   }
+
+  if (isVariableToRemove) {
+    variables.erase(variables.begin() + variableToRemoveIndex);
+    makeShaderProgram();
+  }
 }
 
 void SGCEngine::draw() {
@@ -755,6 +936,12 @@ void SGCEngine::draw() {
         std::max<float>((float)(windowWidth), (float)(windowHeight)) / zoom /
         10.0))));
   glUniform1f(timeUniformLocation, ImGui::GetTime());
+
+  for (const auto variable : variables) {
+    GLint variableUniformLocation =
+      glGetUniformLocation(shaderProgram, variable.name.c_str());
+    glUniform1f(variableUniformLocation, variable.value);
+  }
 
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

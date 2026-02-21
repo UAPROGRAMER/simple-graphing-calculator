@@ -12,7 +12,9 @@ std::string Variable::getVariableShaderPart() const {
   return "uniform float " + std::string(name) + ";";
 }
 
-bool isValidId(std::string id) {
+bool isValidId(const std::string& id) {
+  if (std::isdigit(id.front()))
+    return false;
   for (char c : id)
     if (!std::isalnum(c) && c != '_') return false;
   return true;

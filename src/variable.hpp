@@ -16,4 +16,4 @@ public:
   std::string getVariableShaderPart() const;
 };
 
-bool isValidId(std::string id);
+bool isValidId(const std::string& id);

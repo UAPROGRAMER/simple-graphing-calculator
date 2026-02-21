@@ -32,6 +32,7 @@ set(sgc-sources
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sgc_engine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/graph.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/variable.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 

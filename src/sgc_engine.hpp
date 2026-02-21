@@ -6,6 +6,7 @@
 
 #include "graph.hpp"
 #include "opengl.hpp"
+#include "variable.hpp"
 
 class SGCEngine {
 private:
@@ -29,6 +30,7 @@ private:
   GLint timeUniformLocation = 0;
 
   std::vector<Graph> graphs;
+  std::vector<Variable> variables;
 
   bool makeShaderProgram();
 
