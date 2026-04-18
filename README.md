@@ -34,6 +34,7 @@ through headers first.
 
 - info window (get general info about SGC version, possition, zoom, etc.)
 - graphs window (add, remove and edit graphs)
+- variables window (add, remove, change and edit variables)
 
 ## Graphs
 
@@ -94,6 +95,6 @@ The name of the variable can contain letter, numbers or '_' and starts with a le
 ## Saving graphs
 
 Press save graphs and enter filename you want and all
-graphs will be saved to the file.
+graphs will be saved to the file. (variables will be saved too)
 
 Savefiles are at "./data/saves/"
