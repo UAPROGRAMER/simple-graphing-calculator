@@ -98,3 +98,30 @@ Press save graphs and enter filename you want and all
 graphs will be saved to the file. (variables will be saved too)
 
 Savefiles are at "./data/saves/"
+
+## License
+
+The license for this project is in `LICENSE` file. It is a modified MIT license.
+
+The `extern` folder contains libraries that have their own licenses. This project's license is not applied to `extern` folder.
+
+## Credits
+
+### Voxel Grapher
+
+Creator:
+- [Stanislav Yatskiv | UAPROGRAMER](https://github.com/UAPROGRAMER)
+
+### Used libraries and other
+
+- [OpenGL](https://www.khronos.org/opengl)
+- [GLAD](https://github.com/Dav1dde/glad)
+- [GLFW](https://github.com/glfw/glfw)
+- [ImGui](https://github.com/ocornut/imgui)
+- [mINI](https://github.com/metayeti/mINI)
+- [stb](https://github.com/nothings/stb)
+
+## Contact info
+
+GitHub: [UAPROGRAMER](https://github.com/UAPROGRAMER) \
+Email: stasyatskiu2008@gmail.com
